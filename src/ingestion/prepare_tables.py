@@ -14,7 +14,7 @@ DATA_DIR = Path(__file__).parent.parent.parent / "data" / "raw"
 def prepare_operations() -> pd.DataFrame:
     """Prépare la table 'operations' enrichie avec des agrégats utiles de operations_stats."""
     # Charger les données
-    ops = pd.read_csv(DATA_DIR / "operations.csv", low_memory=False)
+    ops = pd.read_csv(DATA_DIR / "operations.csv", low_memory=False) # enlever le warning
     stats = pd.read_csv(DATA_DIR / "operations_stats.csv", low_memory=False)
 
     # Convertir les dates
@@ -65,15 +65,15 @@ def prepare_resultats_humain() -> pd.DataFrame:
 
 if __name__ == "__main__":
     # Test rapide en local
-    print("✅ Chargement operations...")
+    print("Chargement operations...")
     ops = prepare_operations()
     print(f"   → {len(ops)} lignes")
 
-    print("✅ Chargement flotteurs...")
+    print("Chargement flotteurs...")
     fl = prepare_flotteurs()
     print(f"   → {len(fl)} lignes")
 
-    print("✅ Chargement résultats humains...")
+    print("Chargement résultats humains...")
     rh = prepare_resultats_humain()
     print(f"   → {len(rh)} lignes")
 
