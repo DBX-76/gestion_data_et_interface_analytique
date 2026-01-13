@@ -77,4 +77,4 @@ if __name__ == "__main__":
     rh = prepare_resultats_humain()
     print(f"   → {len(rh)} lignes")
 
-    print("\n🟢 Toutes les tables sont prêtes pour PostgreSQL.")
+    print("\nLes tables sont prêtes pour PostgreSQL.")
