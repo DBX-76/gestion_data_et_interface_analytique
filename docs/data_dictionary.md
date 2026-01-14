@@ -23,12 +23,15 @@
 | `type_operation` | Type d’opération : SAR, MAS, DIV, SUR |
 | `type_operation_saisi` | `True` si saisi manuellement, `False` si imputé |
 | `evenement` | Nature de l'événement (avarie, baignade, etc.) |
+| `categorie_evenement` | Catégorie métier regroupant les événements (ex: "Avaries non suivies d'accident navire", "Fausses alertes", ... |
+| `zone_responsabilite` | Zone de responsabilité opérationnelle du CROSS (ex: "Eaux territoriales", "Responsabilité française") |
+| `fuseau_horaire` | Fuseau horaire de l’opération (ex: "Europe/Paris", "Pacific/Noumea") |
 | `pourquoi_alerte` | Motif de l’alerte (Balise 406, signal pyrotechnique, etc.) |
 | `pourquoi_alerte_saisi` | `True` si saisi manuellement, `False` si imputé |
 | `moyen_alerte` | Canal d’alerte (VHF, téléphone, etc.) |
 | `qui_alerte` | Personne ou entité ayant donné l’alerte |
 | `categorie_qui_alerte` | Catégorie de l’alertant |
-| `cross` | Centre opérationnel (CROSS/MRCC) |
+| `cross_name` | Centre opérationnel (CROSS/MRCC) ayant géré l’opération |
 | `departement` | Département ou collectivité concernée |
 | `prefecture_maritime` | Préfecture maritime responsable |
 | `est_metropolitain` | Opération en métropole ? |

@@ -19,18 +19,21 @@ def init_tables():
             conn.execute(text("""
                 DROP TABLE IF EXISTS operations CASCADE;
                 CREATE TABLE operations (
-                    operation_id INTEGER PRIMARY KEY,
+                    operation_id  BIGINT PRIMARY KEY,
                     date_heure_reception_alerte TIMESTAMPTZ,
                     date_heure_fin_operation TIMESTAMPTZ,
                     type_operation TEXT,
                     type_operation_saisi BOOLEAN,
                     evenement TEXT,
+                    categorie_evenement TEXT,
+                    zone_responsabilite TEXT,
+                    fuseau_horaire TEXT,   
                     pourquoi_alerte TEXT,
                     pourquoi_alerte_saisi BOOLEAN,
                     moyen_alerte TEXT,
                     qui_alerte TEXT,
                     categorie_qui_alerte TEXT,
-                    "cross" TEXT,
+                    cross_name TEXT,
                     departement TEXT,
                     prefecture_maritime TEXT,
                     est_metropolitain BOOLEAN,
@@ -61,7 +64,7 @@ def init_tables():
             conn.execute(text("""
                 DROP TABLE IF EXISTS flotteurs;
                 CREATE TABLE flotteurs (
-                    operation_id INTEGER REFERENCES operations(operation_id) ON DELETE CASCADE,
+                    operation_id BIGINT REFERENCES operations(operation_id) ON DELETE CASCADE,
                     numero_ordre FLOAT,
                     pavillon TEXT,
                     resultat_flotteur TEXT,
@@ -75,7 +78,7 @@ def init_tables():
             conn.execute(text("""
                 DROP TABLE IF EXISTS resultats_humain;
                 CREATE TABLE resultats_humain (
-                    operation_id INTEGER REFERENCES operations(operation_id) ON DELETE CASCADE,
+                    operation_id BIGINT REFERENCES operations(operation_id) ON DELETE CASCADE,
                     categorie_personne TEXT,
                     resultat_humain TEXT,
                     nombre INTEGER,
