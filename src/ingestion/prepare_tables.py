@@ -47,7 +47,8 @@ def get_phase_journee(dt):
         return "nuit"
 
 def impute_departement(row):
-    """Impute departement depuis cross si possible."""
+    """    Impute departement depuis la colonne 'cross' (avant renommage en 'cross_name').  
+    """
     if pd.notna(row["departement"]):
         return row["departement"]
     cross_val = row["cross"]
@@ -142,6 +143,8 @@ def prepare_operations() -> pd.DataFrame:
     # Département (avec ton mapping complet)
     ops["departement"] = ops.apply(impute_departement, axis=1)
 
+    ops = ops.rename(columns={"cross": "cross_name"})
+    
     # === TRANSFORM: colonnes calculées ===
     ops["phase_journee"] = ops["date_heure_reception_alerte"].apply(get_phase_journee)
 
