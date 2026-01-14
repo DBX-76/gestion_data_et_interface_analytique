@@ -73,7 +73,7 @@ def prepare_operations() -> pd.DataFrame:
         if col in ops.columns:
             ops = ops.drop(columns=[col])
 
-    cols_to_drop_stats = ["nom_dst", "nom_stm", "distance_cote_metres", "distance_cote_milles_nautiques", "est_vacances_scolaires"]
+    cols_to_drop_stats = ["nom_dst", "nom_stm"]
     for col in cols_to_drop_stats:
         if col in stats.columns:
             stats = stats.drop(columns=[col])
@@ -95,6 +95,50 @@ def prepare_operations() -> pd.DataFrame:
     ops["longitude"] = ops["longitude"].fillna(-1)
     ops["latitude"] = ops["latitude"].fillna(-1)
 
+    
+    # === IMPUTATION 1 : pourquoi_alerte + flag ===
+    ops["pourquoi_alerte_saisi"] = ops["pourquoi_alerte"].notna()
+    if "evenement" in ops.columns:
+        mode_map = (
+            ops.dropna(subset=["evenement", "pourquoi_alerte"])
+            .groupby("evenement")["pourquoi_alerte"]
+            .agg(lambda x: x.mode().iloc[0] if not x.mode().empty else None)
+        )
+        imputed_from_evenement = ops["evenement"].map(mode_map)
+        mask_to_impute = ops["pourquoi_alerte"].isna() & imputed_from_evenement.notna()
+        ops.loc[mask_to_impute, "pourquoi_alerte"] = imputed_from_evenement[mask_to_impute]
+        ops.loc[mask_to_impute, "pourquoi_alerte_saisi"] = False
+
+    if ops["pourquoi_alerte"].isna().any():
+        global_mode = ops["pourquoi_alerte"].mode()
+        if not global_mode.empty:
+            final_fill = global_mode.iloc[0]
+            mask_final = ops["pourquoi_alerte"].isna()
+            ops.loc[mask_final, "pourquoi_alerte"] = final_fill
+            ops.loc[mask_final, "pourquoi_alerte_saisi"] = False
+
+    # === IMPUTATION 2 : type_operation + flag ===
+    ops["type_operation_saisi"] = ops["type_operation"].notna()
+    if "evenement" in ops.columns:
+        mode_map = (
+            ops.dropna(subset=["evenement", "type_operation"])
+            .groupby("evenement")["type_operation"]
+            .agg(lambda x: x.mode().iloc[0] if not x.mode().empty else None)
+        )
+        imputed_from_evenement = ops["evenement"].map(mode_map)
+        mask_to_impute = ops["type_operation"].isna() & imputed_from_evenement.notna()
+        ops.loc[mask_to_impute, "type_operation"] = imputed_from_evenement[mask_to_impute]
+        ops.loc[mask_to_impute, "type_operation_saisi"] = False
+
+    if ops["type_operation"].isna().any():
+        global_mode = ops["type_operation"].mode()
+        if not global_mode.empty:
+            final_fill = global_mode.iloc[0]
+            mask_final = ops["type_operation"].isna()
+            ops.loc[mask_final, "type_operation"] = final_fill
+            ops.loc[mask_final, "type_operation_saisi"] = False
+
+
     # Département (avec ton mapping complet)
     ops["departement"] = ops.apply(impute_departement, axis=1)
 
@@ -112,7 +156,10 @@ def prepare_operations() -> pd.DataFrame:
         "prefecture_maritime",
         "maree_categorie",
         "maree_port",
-        "maree_coefficient"
+        "maree_coefficient",
+        "distance_cote_metres",
+        "distance_cote_milles_nautiques",
+        "est_vacances_scolaires"
     ]].copy()
 
     # Imputer maree_* et prefecture_maritime
@@ -120,7 +167,9 @@ def prepare_operations() -> pd.DataFrame:
     stats_minimal["maree_categorie"] = stats_minimal["maree_categorie"].fillna("Non renseigné")
     stats_minimal["maree_port"] = stats_minimal["maree_port"].fillna("Non renseigné")
     stats_minimal["maree_coefficient"] = stats_minimal["maree_coefficient"].fillna(-1)
-
+    stats["distance_cote_metres"] = stats["distance_cote_metres"].fillna(-1)
+    stats["distance_cote_milles_nautiques"] = stats["distance_cote_milles_nautiques"].fillna(-1)
+    stats["est_vacances_scolaires"] = stats["est_vacances_scolaires"].astype('boolean').fillna(False).astype(bool)
     # Fusion
     df = ops.merge(stats_minimal, on="operation_id", how="left")
 
