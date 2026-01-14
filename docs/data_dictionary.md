@@ -15,50 +15,79 @@
 
 ## Table `operations`
 
-| Colonne | Source | Type | Description | À garder ? |
-|--------|--------|------|-------------|-----------|
-| `operation_id` | operations.csv | entier | Identifiant unique de l'opération 
-| `date_heure_reception_alerte` | operations.csv | datetime | Date/heure de réception de l'alerte 
-| `date_heure_fin_operation` | operations.csv | datetime | Date/heure de fin de l'opération 
-| `type_operation` | operations.csv | texte | Type : MAS, SAR, etc. 
-| `evenement` | operations.csv | texte | Nature de l'événement (avarie, baignade, etc.) 
-| `moyen_alerte` | operations.csv | texte | VHF, téléphone, balise, etc. 
-| `qui_alerte` | operations.csv | texte | Qui a donné l'alerte 
-| `categorie_qui_alerte` | operations.csv | texte | Catégorie de l'alertant 
-| `cross` | operations.csv | texte | Centre opérationnel (CROSS/MRCC) 
-| `departement` | operations.csv | texte | Département ou collectivité concernée 
-| `est_metropolitain` | operations.csv | booléen | Opération en métropole 
-| `vent_force` | operations.csv | nombre | Force du vent (échelle Beaufort) 
-| `mer_force` | operations.csv | nombre | Hauteur de la mer 
-| `numero_sitrep` | operations.csv | entier | Numéro du compte-rendu SITREP 
-| `cross_sitrep` | operations.csv | texte | Référence complète (ex: "Nouvelle-Calédonie SAR 2025/184") 
-| `systeme_source` | operations.csv | texte | Système d'origine (ex: secmarweb) 
-| `seconde_autorite` | operations.csv | texte | >96% NaN | ❌ SUPPRIMÉ |
+| Colonne | Description |
+|--------|-------------|
+| `operation_id` | Identifiant unique de l'opération |
+| `date_heure_reception_alerte` | Date/heure de réception de l'alerte |
+| `date_heure_fin_operation` | Date/heure de fin de l'opération |
+| `type_operation` | Type d’opération : SAR, MAS, DIV, SUR |
+| `type_operation_saisi` | `True` si saisi manuellement, `False` si imputé |
+| `evenement` | Nature de l'événement (avarie, baignade, etc.) |
+| `pourquoi_alerte` | Motif de l’alerte (Balise 406, signal pyrotechnique, etc.) |
+| `pourquoi_alerte_saisi` | `True` si saisi manuellement, `False` si imputé |
+| `moyen_alerte` | Canal d’alerte (VHF, téléphone, etc.) |
+| `qui_alerte` | Personne ou entité ayant donné l’alerte |
+| `categorie_qui_alerte` | Catégorie de l’alertant |
+| `cross` | Centre opérationnel (CROSS/MRCC) |
+| `departement` | Département ou collectivité concernée |
+| `prefecture_maritime` | Préfecture maritime responsable |
+| `est_metropolitain` | Opération en métropole ? |
+| `vent_force` | Force du vent (échelle Beaufort) |
+| `mer_force` | Hauteur de la mer |
+| `vent_direction` | Direction du vent (degrés, -1 si inconnue) |
+| `vent_direction_categorie` | Catégorie de direction (ex: "VARIABLE") |
+| `longitude` | Coordonnée géographique (-1 si inconnue) |
+| `latitude` | Coordonnée géographique (-1 si inconnue) |
+| `autorite` | Autorité en charge |
+| `numero_sitrep` | Numéro du compte-rendu SITREP |
+| `cross_sitrep` | Référence complète (ex: "Nouvelle-Calédonie SAR 2025/184") |
+| `systeme_source` | Système d'origine (ex: secmarweb) |
+| `phase_journee` | Période de la journée : matinée, déjeuner, après-midi, nuit |
+| `sans_flotteur_implique` | Aucun flotteur impliqué ? |
+| `total_flotteurs_impliques` | Nombre total de flotteurs impliqués |
+| `maree_categorie` | Catégorie de marée |
+| `maree_port` | Port de référence pour la marée |
+| `maree_coefficient` | Coefficient de marée (-1 si inconnu) |
+| `distance_cote_metres` | Distance à la côte en mètres (-1 si inconnue) |
+| `distance_cote_milles_nautiques` | Distance à la côte en milles nautiques (-1 si inconnue) |
+| `est_vacances_scolaires` | Opération pendant les vacances scolaires ? |
+| `donnees_meteo_imputees` | `True` si vent/mer ont été imputés par la médiane |
+
+> 💡 **Note sur l’imputation contrôlée**  
+> Les colonnes `pourquoi_alerte` et `type_operation` ont été imputées automatiquement à partir de leur relation avec `evenement`, puis complétées par le mode global.  
+> Deux flags (`pourquoi_alerte_saisi`, `type_operation_saisi`) indiquent si la valeur provient d’une saisie humaine (`True`) ou d’une imputation (`False`).  
+> Ces données restent modifiables via l’interface CRUD, conformément à l’objectif du projet.
+
+### Colonnes supprimées de `operations.csv`
+- `seconde_autorite` (>96 % de valeurs manquantes)
 
 ### Colonnes ajoutées depuis `operations_stats.csv`
-
 | Colonne | Description | Calcul |
 |--------|-------------|--------|
-| `sans_flotteur_implique` | Aucun flotteur impliqué | Booléen direct |
+| `sans_flotteur_implique` | Aucun flotteur impliqué ? | Booléen direct |
 | `total_flotteurs_impliques` | Nombre total de flotteurs impliqués | Somme de toutes les colonnes `nombre_flotteurs_*` |
 
 ### Colonnes supprimées de `operations_stats.csv`
-- `nom_dst` (98.8% NaN)
-- `nom_stm` (93.2% NaN)
+- `nom_dst` (98,8 % de NaN)
+- `nom_stm` (93,2 % de NaN)
 - Toutes les colonnes détaillées `nombre_flotteurs_...` (trop fines pour le MVP)
 - Colonnes temporelles (`annee`, `mois`, etc.) → calculables depuis la date
+
+---
 
 ## Table `flotteurs`
 
 | Colonne | Description |
 |--------|-------------|
 | `operation_id` | Lien vers l'opération |
-| `numero_ordre` | Ordre du flotteur dans l'opération |
+| `numero_ordre` | Ordre du flotteur dans l'opération (-1 si inconnu) |
 | `pavillon` | Nationalité (Français, Étranger, etc.) |
 | `resultat_flotteur` | Issue (Remorqué, Assisté, etc.) |
 | `type_flotteur` | Type détaillé (Plaisance à moteur < 8m, etc.) |
 | `categorie_flotteur` | Catégorie large (Plaisance, Commerce, Pêche) |
 | `numero_immatriculation` | Immatriculation (si connue) |
+
+---
 
 ## Table `resultats_humain`
 
