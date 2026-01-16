@@ -11,8 +11,6 @@
 
 > Cette approche permet un **CRUD simple** et  un **dashboard efficace**
 
-# Dictionnaire des données
-
 ## Table `operations`
 
 | Colonne | Description |
@@ -101,3 +99,19 @@
 | `resultat_humain` | Statut (Personne assistée, tirée d'affaire, etc.) |
 | `nombre` | Nombre total de personnes dans cette catégorie |
 | `dont_nombre_blesse` | Nombre de blessés parmi elles |
+
+## Table `audit_log`
+
+Table de traçabilité des modifications manuelles effectuées via l’application.
+
+| Colonne | Description |
+|--------|-------------|
+| `id` | Identifiant technique auto-incrémenté de l’entrée d’audit |
+| `table_name` | Nom de la table modifiée (ex: `"operations"`) |
+| `operation` | Type d’opération (`"UPDATE"`, `"INSERT"`, `"DELETE"`) |
+| `changed_by` | Identifiant de l’utilisateur ayant effectué la modification |
+| `operation_id` | `operation_id` de l’opération concernée (référence vers `operations`) |
+| `column_name` | Nom de la colonne modifiée (ex: `"type_operation"`) |
+| `old_value` | Valeur avant modification (sous forme textuelle) |
+| `new_value` | Valeur après modification (sous forme textuelle) |
+| `timestamp` | Date et heure de la modification (UTC par défaut) |

@@ -89,13 +89,16 @@ def init_tables():
             # === TABLE audit_log ===
             conn.execute(text("""
                 DROP TABLE IF EXISTS audit_log;
-                CREATE TABLE audit_log (
+                CREATE TABLE IF NOT EXISTS audit_log (
                     id SERIAL PRIMARY KEY,
                     table_name TEXT NOT NULL,
                     operation TEXT NOT NULL,
-                    operation_date TIMESTAMPTZ DEFAULT NOW(),
-                    changed_by TEXT DEFAULT 'operator',
-                    operation_id INTEGER
+                    changed_by TEXT NOT NULL,
+                    operation_id BIGINT,
+                    column_name TEXT,
+                    old_value TEXT,
+                    new_value TEXT,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """))
 

@@ -4,10 +4,15 @@ Charge les DataFrames transformés dans PostgreSQL.
 """
 
 import os
+import sys
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
-from ingestion.prepare_tables import (
+
+# Add src to path for relative imports when run as script
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from ..ingestion.prepare_tables import (
     prepare_operations,
     prepare_flotteurs,
     prepare_resultats_humain
